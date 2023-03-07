@@ -1,14 +1,16 @@
 import { useState, useCallback, useEffect } from "react";
 
-const ItunesService = () => {
+const TopOneHundredPodcast = () => {
 	const [podcastApiResponse, setPodcastApiResponse] = useState(null)
 	const [topPodcast, setTopPodcast] = useState(null)
+	let storage = window.localStorage;
 
 	const fetchData = async () => {
 		try {
 			const response = await fetch('https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json');
 			const data = await response.json();
 			setPodcastApiResponse(data);
+			storage.setItem('podcast', data)
 		} catch (error) {
 			console.error(error);
 		}
@@ -20,16 +22,17 @@ const ItunesService = () => {
 
 	const transformData = useCallback(() => {
 		const entry = podcastApiResponse?.feed?.entry ? podcastApiResponse?.feed?.entry : [];
-		console.log(entry[0], 'keys')
+		const filterInfo = [];
 		entry.forEach( element => {
 			const info = {
-				'id': element.id.atributes['im:id']
+				'id': element.id.attributes['im:id'],
 				'image': element['im:image'],
-				'author': element['im:name'],
+				'title': element['im:name'],
+				'author': element['im:artist'].label,
 			}
-			console.log(element.id, 'mas pruebas', element['im:image'] )
-			console.log(Object.keys(element), 'sigo probando')
+			filterInfo.push(info)
 		} )
+		setTopPodcast(filterInfo);
 	}, [podcastApiResponse]);
 
 	useEffect(() => {
@@ -39,4 +42,4 @@ const ItunesService = () => {
 	return topPodcast;
 }
 
-export default ItunesService;
+export default TopOneHundredPodcast;

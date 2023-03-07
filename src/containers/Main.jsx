@@ -1,17 +1,35 @@
 import { IntroductionCard } from "../components/IntroductionCard/IntroductionCard";
-import ItunesService from "../services/ItunesService";
+import TopOneHundredPodcast from "../services/TopOneHundredPodcast";
+import {Spinner} from "../components/Spinner/Spinner";
 
-export const Main = () => {
+export const Main = async () => {
+	try {
+		const data = await TopOneHundredPodcast();
 
-	console.log(ItunesService(), 'hasta el pepe')
-
-	const cosa = {
-		"image": "https://img2.freepng.es/20190610/tr/kisspng-portable-network-graphics-heart-vector-graphics-dr-5cfe33f5718746.214721841560163317465.jpg",
-		"name": "You and yourself",
-		"author": "Jazmine"
-
+		if (data) {
+			return (
+				<>
+					{data.map((podcast) => (
+						<IntroductionCard cosa={podcast} />
+					))}
+				</>
+			);
+		} else {
+			return (
+				<>
+					<h3>En este momento nuestra web no está operativa, por favor, inténtelo de nuevo más tarde</h3>
+					<Spinner />
+				</>
+			);
+		}
+	} catch (error) {
+		// Manejar el error
+		console.error(error);
+		return (
+			<>
+				<h3>Hubo un error al cargar los datos, por favor inténtelo de nuevo más tarde</h3>
+				<Spinner />
+			</>
+		);
 	}
-	return (
-		<IntroductionCard cosa={cosa} />
-	)
-}
+};
